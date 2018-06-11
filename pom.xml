@@ -41,6 +41,11 @@
         </dependency>
         <dependency>
             <groupId>org.esa.snap</groupId>
+            <artifactId>ceres-binding</artifactId>
+            <version>${snap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.esa.snap</groupId>
             <artifactId>ceres-jai</artifactId>
             <version>${snap.version}</version>
         </dependency>
@@ -79,19 +84,20 @@
             <artifactId>snap-csv-dataio</artifactId>
             <version>${snap.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.esa.snap</groupId>
             <artifactId>snap-raster</artifactId>
             <version>${snap.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.esa.snap</groupId>
-            <artifactId>snap-collocation</artifactId>
-            <version>${snap.version}</version>
-        </dependency>
-		<dependency>
             <groupId>org.esa.s3tbx</groupId>
             <artifactId>s3tbx-idepix</artifactId>
+            <version>${snap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.esa.s3tbx</groupId>
+            <artifactId>s3tbx-rad2refl</artifactId>
             <version>${snap.version}</version>
         </dependency>
         

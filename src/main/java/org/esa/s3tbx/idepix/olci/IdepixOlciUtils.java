@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.algorithms.olci;
+package org.esa.s3tbx.idepix.olci;
 
 import org.esa.s3tbx.idepix.core.IdepixFlagCoding;
 import org.esa.snap.core.datamodel.FlagCoding;
@@ -10,7 +10,7 @@ import org.esa.snap.core.datamodel.Product;
  * @author olafd
  */
 
-public class OlciUtils {
+public class IdepixOlciUtils {
 
     /**
      * Provides OLCI pixel classification flag coding

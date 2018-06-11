@@ -4,14 +4,14 @@
 
     <folder name="Actions">
         <folder name="Operators">
-            <file name="org-esa-s3tbx-olci-o2corr-O2CorrOlciOpAction.instance">
+            <file name="org-esa-s3tbx-idepix-olci-IdepixOlciOpAction.instance">
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="delegate" methodvalue="org.esa.snap.core.gpf.ui.DefaultOperatorAction.create"/>
-                <attr name="displayName" stringvalue="O2 Correction (OLCI)"/>
-                <attr name="operatorName" stringvalue="O2CorrOlci"/>
-                <attr name="dialogTitle" stringvalue="O2 Correction (OLCI) - v0.8"/>
-                <attr name="targetProductNameSuffix" stringvalue="_o2corr"/>
-                <attr name="helpId" stringvalue="o2corrTool"/>
+                <attr name="displayName" stringvalue="Sentinel-3 OLCI PLUGIN"/>
+                <attr name="operatorName" stringvalue="Idepix.Sentinel3.Plugin.Olci"/>
+                <attr name="dialogTitle" stringvalue="IdePix (Sentinel-3 OLCI mode) - v0.8"/>
+                <attr name="targetProductNameSuffix" stringvalue="_idepix"/>
+                <attr name="helpId" stringvalue="idepixPluginOlciTool"/>
             </file>
         </folder>
     </folder>
@@ -19,12 +19,16 @@
     <folder name="Menu">
         <folder name="Optical">
             <folder name="Preprocessing">
-                <file name="org-esa-s3tbx-olci-o2corr-O2CorrOlciOpAction.shadow">
-                    <attr name="originalFile"
-                          stringvalue="Actions/Operators/org-esa-s3tbx-olci-o2corr-O2CorrOlciOpAction.instance"/>
-                    <attr name="position" intvalue="1"/>
-                    <attr name="displayName" stringvalue="O2 Correction (OLCI)"/>
-                </file>
+                <folder name="Masking">
+                    <folder name="IdePix (Clouds, Land, Water, ...)">
+                        <file name="org-esa-s3tbx-idepix-olci-IdepixOlciOpAction.shadow">
+                            <attr name="originalFile"
+                                  stringvalue="Actions/Operators/org-esa-s3tbx-idepix-olci-IdepixOlciOpAction.instance"/>
+                            <attr name="position" intvalue="1"/>
+                            <attr name="displayName" stringvalue="Idepix (Sentinel-3 OLCI) PLUGIN"/>
+                        </file>
+                    </folder>
+                </folder>
             </folder>
         </folder>
     </folder>

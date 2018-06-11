@@ -1,11 +1,11 @@
-package org.esa.s3tbx.idepix.algorithms.olci;
+package org.esa.s3tbx.idepix.olci;
 
 import com.bc.ceres.binding.ValueRange;
 
 /**
  * @author Marco Peters
  */
-public class OlciCloudNNInterpreter {
+public class IdepixOlciCloudNNInterpreter {
 
     private static final ValueRange CLEAR_SNOW_ICE_BOUNDS = new ValueRange(0.0, 1.1, true, false);
     private static final ValueRange OPAQUE_CLOUD_BOUNDS = new ValueRange(1.1, 2.75, true, false);
@@ -18,12 +18,12 @@ public class OlciCloudNNInterpreter {
 //    private static final ValueRange CLEAR_LAND_BOUNDS = new ValueRange(3.75, 5.3, true, false);
 //    private static final ValueRange CLEAR_WATER_BOUNDS = new ValueRange(5.3, 6.00, true, true);
 
-    private OlciCloudNNInterpreter() {
+    private IdepixOlciCloudNNInterpreter() {
     }
 
     // Here we might add the nn as parameter to decide which valueRanges to load
-    public static OlciCloudNNInterpreter create() {
-        return new OlciCloudNNInterpreter();
+    public static IdepixOlciCloudNNInterpreter create() {
+        return new IdepixOlciCloudNNInterpreter();
     }
 
     // currently not used

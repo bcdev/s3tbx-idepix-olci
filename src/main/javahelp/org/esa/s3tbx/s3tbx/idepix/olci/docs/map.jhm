@@ -5,8 +5,9 @@
 
 <map version="2.0">
 
-    <mapID target="o2corrTool" url="o2corr/O2CorrTool.html"/>
-    <mapID target="o2corrAlgorithmSpecification" url="o2corr/O2CorrAlgorithmSpecification.html"/>
-    <mapID target="o2corrProcessorDescription" url="o2corr/O2CorrProcessorDescription.html"/>
+    <mapID target="idepixPluginOlciTool" url="olci/IdepixOlciTool.html"/>
+    <mapID target="idepixPluginOlciAlgorithmSpecification" url="olci/IdepixOlciAlgorithmSpecification.html"/>
+    <mapID target="idepixPluginOlciProcessorDescription" url="olci/IdepixOlciProcessorDescription.html"/>
+    <mapID target="idepixPluginOlciCommandLine" url="olci/IdepixOlciCommandLine.html"/>
 
 </map>

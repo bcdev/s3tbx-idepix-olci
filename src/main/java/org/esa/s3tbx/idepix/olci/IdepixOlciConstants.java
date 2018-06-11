@@ -1,11 +1,11 @@
-package org.esa.s3tbx.idepix.algorithms.olci;
+package org.esa.s3tbx.idepix.olci;
 
 /**
  * Constants for Idepix OLCI algorithm
  *
  * @author olafd
  */
-public class OlciConstants {
+public class IdepixOlciConstants {
 
     /* Level 1 Quality Flags Positions */
     public static final int L1_F_LAND = 31;

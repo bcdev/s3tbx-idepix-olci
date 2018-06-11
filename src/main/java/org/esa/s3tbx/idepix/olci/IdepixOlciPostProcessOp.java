@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.algorithms.olci;
+package org.esa.s3tbx.idepix.olci;
 
 import com.bc.ceres.core.ProgressMonitor;
 import org.esa.s3tbx.idepix.algorithms.CloudBuffer;
@@ -34,7 +34,7 @@ import java.awt.*;
         authors = "Olaf Danne",
         copyright = "(c) 2016 by Brockmann Consult",
         description = "Refines the OLCI pixel classification over both land and water.")
-public class OlciPostProcessOp extends Operator {
+public class IdepixOlciPostProcessOp extends Operator {
 
     @Parameter(defaultValue = "true",
             label = " Compute a cloud buffer",
@@ -206,7 +206,7 @@ public class OlciPostProcessOp extends Operator {
     public static class Spi extends OperatorSpi {
 
         public Spi() {
-            super(OlciPostProcessOp.class);
+            super(IdepixOlciPostProcessOp.class);
         }
     }
 

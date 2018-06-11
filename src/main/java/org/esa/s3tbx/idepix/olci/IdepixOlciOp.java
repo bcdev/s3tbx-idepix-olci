@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.algorithms.olci;
+package org.esa.s3tbx.idepix.olci;
 
 import org.esa.s3tbx.idepix.core.AlgorithmSelector;
 import org.esa.s3tbx.idepix.core.IdepixConstants;
@@ -35,13 +35,13 @@ import java.util.Map;
  *
  * @author olafd
  */
-@OperatorMetadata(alias = "Idepix.Sentinel3.Olci",
+@OperatorMetadata(alias = "Idepix.Sentinel3.Plugin.Olci",
         category = "Optical/Pre-Processing",
         version = "1.0",
         authors = "Olaf Danne",
-        copyright = "(c) 2016 by Brockmann Consult",
+        copyright = "(c) 2018 by Brockmann Consult",
         description = "Pixel identification and classification for OLCI.")
-public class OlciOp extends BasisOp {
+public class IdepixOlciOp extends BasisOp {
 
     @SourceProduct(alias = "sourceProduct",
             label = "OLCI L1b product",
@@ -157,7 +157,7 @@ public class OlciOp extends BasisOp {
         targetProduct.setStartTime(idepixProduct.getStartTime());
         targetProduct.setEndTime(idepixProduct.getEndTime());
 
-        OlciUtils.setupOlciClassifBitmask(targetProduct);
+        IdepixOlciUtils.setupOlciClassifBitmask(targetProduct);
 
         if (outputRadiance) {
             IdepixIO.addRadianceBands(sourceProduct, targetProduct, radianceBandsToCopy);
@@ -195,7 +195,7 @@ public class OlciOp extends BasisOp {
 
     private void computeCloudProduct() {
         setClassificationParameters();
-        classificationProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(OlciClassificationOp.class),
+        classificationProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciClassificationOp.class),
                                                   classificationParameters, classificationInputProducts);
     }
 
@@ -215,7 +215,7 @@ public class OlciOp extends BasisOp {
         params.put("computeCloudBuffer", computeCloudBuffer);
         params.put("cloudBufferWidth", cloudBufferWidth);
 
-        postProcessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(OlciPostProcessOp.class),
+        postProcessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciPostProcessOp.class),
                                                   params, input);
     }
 
@@ -226,7 +226,7 @@ public class OlciOp extends BasisOp {
     public static class Spi extends OperatorSpi {
 
         public Spi() {
-            super(OlciOp.class);
+            super(IdepixOlciOp.class);
         }
     }
 }
