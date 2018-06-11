@@ -12,7 +12,6 @@ import org.esa.snap.core.datamodel.Product;
 import org.esa.snap.core.datamodel.TiePointGrid;
 import org.esa.snap.core.gpf.Operator;
 import org.esa.snap.core.gpf.OperatorException;
-import org.esa.snap.core.gpf.OperatorSpi;
 import org.esa.snap.core.gpf.Tile;
 import org.esa.snap.core.gpf.annotations.OperatorMetadata;
 import org.esa.snap.core.gpf.annotations.Parameter;
@@ -201,13 +200,6 @@ public class IdepixOlciPostProcessOp extends Operator {
         int sourceFlags = sourceFlagTile.getSampleInt(x, y);
         int computedFlags = targetTile.getSampleInt(x, y);
         targetTile.setSample(x, y, sourceFlags | computedFlags);
-    }
-
-    public static class Spi extends OperatorSpi {
-
-        public Spi() {
-            super(IdepixOlciPostProcessOp.class);
-        }
     }
 
 }

@@ -8,6 +8,8 @@ import org.esa.s3tbx.idepix.operators.IdepixProducts;
 import org.esa.s3tbx.processor.rad2refl.Sensor;
 import org.esa.snap.core.datamodel.Band;
 import org.esa.snap.core.datamodel.Product;
+import org.esa.snap.core.datamodel.ProductData;
+import org.esa.snap.core.datamodel.VirtualBand;
 import org.esa.snap.core.gpf.GPF;
 import org.esa.snap.core.gpf.OperatorException;
 import org.esa.snap.core.gpf.OperatorSpi;
@@ -39,7 +41,7 @@ import java.util.Map;
         category = "Optical/Pre-Processing",
         version = "1.0",
         authors = "Olaf Danne",
-        copyright = "(c) 2018 by Brockmann Consult",
+        copyright = "(c) 2016 by Brockmann Consult",
         description = "Pixel identification and classification for OLCI.")
 public class IdepixOlciOp extends BasisOp {
 
@@ -47,6 +49,12 @@ public class IdepixOlciOp extends BasisOp {
             label = "OLCI L1b product",
             description = "The OLCI L1b source product.")
     private Product sourceProduct;
+
+    @SourceProduct(alias = "demProduct",
+            optional = true,
+            label = "DEM product for O2 correction",
+            description = "DEM product.")
+    private Product demProduct;
 
     @TargetProduct(description = "The target product.")
     private Product targetProduct;
@@ -64,7 +72,7 @@ public class IdepixOlciOp extends BasisOp {
                     "Oa21_radiance"
             },
             defaultValue = "")
-    private String[] radianceBandsToCopy;
+    String[] radianceBandsToCopy;
 
     @Parameter(description = "The list of reflectance bands to write to target product.",
             label = "Select TOA reflectances to write to the target product",
@@ -75,8 +83,9 @@ public class IdepixOlciOp extends BasisOp {
                     "Oa16_reflectance", "Oa17_reflectance", "Oa18_reflectance", "Oa19_reflectance", "Oa20_reflectance",
                     "Oa21_reflectance"
             },
+//            defaultValue = "Oa08_reflectance,Oa10_reflectance")
             defaultValue = "")
-    private String[] reflBandsToCopy;
+    String[] reflBandsToCopy;
 
     @Parameter(defaultValue = "false",
             label = " Write NN value to the target product",
@@ -86,26 +95,58 @@ public class IdepixOlciOp extends BasisOp {
     @Parameter(defaultValue = "true", label = " Compute a cloud buffer")
     private boolean computeCloudBuffer;
 
+    @Parameter(defaultValue = "false",
+            label = " Compute binary mask 'cloud_over_snow' using O2 corrected band13 transmission (experimental option)",
+            description = " Computes and writes a binary mask 'cloud_over_snow' using O2 corrected transmission at " +
+                    "band 13 (experimental option, requires additional plugin and reflectance band 21)")
+    private boolean applyO2CorrectedTransmission;
+
+    // no longer used
+//    @Parameter(defaultValue = "v3", valueSet = {"v3", "v1"},
+//            label = " Version of O2 Correction processor (if applied)",
+//            description = "Version of O2 Correction processor (if applied)")
+//    private String o2CorrectionVersion;
+
+    @Parameter(defaultValue = "band_1",
+            label = " Name of DEM band (if optionalDEM product is provided)",
+            description = "Version of O2 Correction processor (if applied)")
+    private String demBandName;
+
     @Parameter(defaultValue = "2", interval = "[0,100]",
             description = "The width of a cloud 'safety buffer' around a pixel which was classified as cloudy.",
             label = "Width of cloud buffer (# of pixels)")
     private int cloudBufferWidth;
 
     @Parameter(defaultValue = "false",
-            label = " Use SRTM Land/Water mask",
-            description = "If selected, SRTM Land/Water mask is used instead of L1b land flag. " +
-                    "Slower, but in general more precise.")
-    private boolean useSrtmLandWaterMask;
+            label = " Compute cloud top pressure (experimental option, time consuming)",
+            description = " Compute cloud top pressure (time consuming, requires Python plugin based on CAWA). ")
+    private boolean computeCtp;
+
+    @Parameter(defaultValue = "false",
+            label = " Compute a cloud shadow (experimental option, requires cloud top pressure)",
+            description = " If applied, a cloud shadow is computed. " +
+                    "This requires the cloud top pressure operator (Python plugin based on CAWA) to be installed. " +
+                    "Still experimental. ")
+    private boolean computeCloudShadow;
+
+    @Parameter(defaultValue = "false",
+            label = " Compute 'combined cloud' band  (experimental option, following DM/JM)",
+            description = " Compute 'combined cloud' band  (experimental option, following DM/JM). " +
+                    "Requires nn_value, reflectance bands 2-8 and 17! ")
+    private boolean computeCombinedCloud;
 
 
     private Product classificationProduct;
     private Product postProcessingProduct;
+    private Product combinedCloudProduct;
 
     private Product rad2reflProduct;
-    private Product waterMaskProduct;
+//    private Product waterMaskProduct;
 
     private Map<String, Product> classificationInputProducts;
     private Map<String, Object> classificationParameters;
+    private Product o2CorrProduct;
+    private Product o2CloudProduct;
 
     @Override
     public void initialize() throws OperatorException {
@@ -114,6 +155,8 @@ public class IdepixOlciOp extends BasisOp {
         if (!inputProductIsValid) {
             throw new OperatorException(IdepixConstants.INPUT_INCONSISTENCY_ERROR_MESSAGE);
         }
+
+        computeCtp |= computeCloudShadow;
 
         outputRadiance = radianceBandsToCopy != null && radianceBandsToCopy.length > 0;
         outputRad2Refl = reflBandsToCopy != null && reflBandsToCopy.length > 0;
@@ -129,16 +172,61 @@ public class IdepixOlciOp extends BasisOp {
 
         ProductUtils.copyFlagBands(sourceProduct, olciIdepixProduct, true);
 
-        if (computeCloudBuffer) {
-            postProcess(olciIdepixProduct);
+        if (computeCtp || computeCloudBuffer || computeCloudShadow) {
+            if (computeCtp || computeCloudShadow) {
+                copyBandsForCtp(olciIdepixProduct);
+                Map<String, Product> ctpSourceProducts = new HashMap<>();
+                ctpSourceProducts.put("l1b", olciIdepixProduct);
+                Product ctpProduct = GPF.createProduct("py_olci_ctp_op", GPF.NO_PARAMS, ctpSourceProducts);
+                ProductUtils.copyBand("ctp", ctpProduct, olciIdepixProduct, true);
+                olciIdepixProduct.getBand("ctp").setUnit("hPa");
+            }
+            if (computeCloudBuffer || computeCloudShadow) {
+                postProcess(olciIdepixProduct);
+            }
+        }
+
+        if (computeCombinedCloud) {
+            processCombinedCloud(olciIdepixProduct);
         }
 
         targetProduct = createTargetProduct(olciIdepixProduct);
         targetProduct.setAutoGrouping(olciIdepixProduct.getAutoGrouping());
 
+        if (applyO2CorrectedTransmission) {
+//            if (o2CorrectionVersion.equals("v1")) {
+//                for (int i = 13; i <= 15; i++) {
+//                    ProductUtils.copyBand("radiance_" + i, o2CorrProduct, "Oa" + i + "_radiance_o2corr",
+//                                          targetProduct, true);
+//                    ProductUtils.copyBand("trans_" + i, o2CorrProduct, "Oa" + i + "_trans_o2corr",
+//                                          targetProduct, true);
+//                }
+//                ProductUtils.copyBand("o2_cloud", o2CloudProduct, targetProduct, true);
+//                ProductUtils.copyBand("trans13_baseline", o2CloudProduct, targetProduct, true);
+//                ProductUtils.copyBand("trans13_baseline_AMFcorr", o2CloudProduct, targetProduct, true);
+//                ProductUtils.copyBand("trans13_excess", o2CloudProduct, targetProduct, true);
+//            } else {
+//                ProductUtils.copyBand("trans_13", o2CorrProduct, targetProduct, true);
+//                ProductUtils.copyBand("press_13", o2CorrProduct, targetProduct, true);
+//                ProductUtils.copyBand("surface_13", o2CorrProduct, targetProduct, true);
+//                ProductUtils.copyBand("altitude", sourceProduct, targetProduct, true);
+//                addSurfacePressureBand();
+//                addCloudOverSnowBand();
+//            }
+            ProductUtils.copyBand("trans_13", o2CorrProduct, targetProduct, true);
+            ProductUtils.copyBand("press_13", o2CorrProduct, targetProduct, true);
+            ProductUtils.copyBand("surface_13", o2CorrProduct, targetProduct, true);
+            ProductUtils.copyBand("altitude", sourceProduct, targetProduct, true);
+            addSurfacePressureBand();
+            addCloudOverSnowBand();
+        }
+
         if (postProcessingProduct != null) {
             Band cloudFlagBand = targetProduct.getBand(IdepixConstants.CLASSIF_BAND_NAME);
             cloudFlagBand.setSourceImage(postProcessingProduct.getBand(IdepixConstants.CLASSIF_BAND_NAME).getSourceImage());
+        }
+        if (combinedCloudProduct != null) {
+            ProductUtils.copyBand(IdepixOlciConstants.OLCI_COMBINED_CLOUD_BAND_NAME, combinedCloudProduct, targetProduct, true);
         }
     }
 
@@ -170,6 +258,10 @@ public class IdepixOlciOp extends BasisOp {
             ProductUtils.copyBand(IdepixConstants.NN_OUTPUT_BAND_NAME, idepixProduct, targetProduct, true);
         }
 
+        if (computeCtp) {
+            ProductUtils.copyBand(IdepixConstants.CTP_OUTPUT_BAND_NAME, idepixProduct, targetProduct, true);
+        }
+
         return targetProduct;
     }
 
@@ -177,20 +269,32 @@ public class IdepixOlciOp extends BasisOp {
     private void preProcess() {
         rad2reflProduct = IdepixProducts.computeRadiance2ReflectanceProduct(sourceProduct, Sensor.OLCI);
 
-        if (useSrtmLandWaterMask) {
-            HashMap<String, Object> waterMaskParameters = new HashMap<>();
-            waterMaskParameters.put("resolution", IdepixConstants.LAND_WATER_MASK_RESOLUTION);
-            waterMaskParameters.put("subSamplingFactorX", IdepixConstants.OVERSAMPLING_FACTOR_X);
-            waterMaskParameters.put("subSamplingFactorY", IdepixConstants.OVERSAMPLING_FACTOR_Y);
-            waterMaskProduct = GPF.createProduct("LandWaterMask", waterMaskParameters, sourceProduct);
+        if (applyO2CorrectedTransmission) {
+            Map<String, Product> o2corrSourceProducts = new HashMap<>();
+            Map<String, Object> o2corrParms = new HashMap<>();
+            o2corrSourceProducts.put("l1b", sourceProduct);
+            if (demProduct != null) {
+                o2corrSourceProducts.put("DEM", demProduct);
+                o2corrParms.put("demAltitudeBandName", demBandName);
+            }
+//            final String o2CorrOpName = o2CorrectionVersion.equals("v1") ? "py_o2corr_op" : "py_o2corr_v3_op";
+            final String o2CorrOpName = "O2CorrOlci";
+            o2CorrProduct = GPF.createProduct(o2CorrOpName, o2corrParms, o2corrSourceProducts);
+
+//            if (o2CorrectionVersion.equals("v1")) {
+//                Map<String, Product> o2CloudSourceProducts = new HashMap<>();
+//                o2CloudSourceProducts.put("l1b", sourceProduct);
+//                o2CloudSourceProducts.put("o2", o2CorrProduct);
+//                o2CloudProduct = GPF.createProduct("Idepix.Olci.O2cloud", GPF.NO_PARAMS, o2CloudSourceProducts);
+//            }
         }
+
     }
 
     private void setClassificationParameters() {
         classificationParameters = new HashMap<>();
         classificationParameters.put("copyAllTiePoints", true);
         classificationParameters.put("outputSchillerNNValue", outputSchillerNNValue);
-        classificationParameters.put("useSrtmLandWaterMask", useSrtmLandWaterMask);
     }
 
     private void computeCloudProduct() {
@@ -203,7 +307,6 @@ public class IdepixOlciOp extends BasisOp {
         classificationInputProducts = new HashMap<>();
         classificationInputProducts.put("l1b", sourceProduct);
         classificationInputProducts.put("rhotoa", rad2reflProduct);
-        classificationInputProducts.put("waterMask", waterMaskProduct);
     }
 
     private void postProcess(Product olciIdepixProduct) {
@@ -213,10 +316,53 @@ public class IdepixOlciOp extends BasisOp {
 
         Map<String, Object> params = new HashMap<>();
         params.put("computeCloudBuffer", computeCloudBuffer);
-        params.put("cloudBufferWidth", cloudBufferWidth);
+        params.put("computeCloudShadow", computeCloudShadow);
 
         postProcessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciPostProcessOp.class),
                                                   params, input);
+    }
+
+    private void processCombinedCloud(Product olciIdepixProduct) {
+        HashMap<String, Product> input = new HashMap<>();
+        input.put("rad2refl", rad2reflProduct);
+        input.put("olciCloud", olciIdepixProduct);
+
+        Map<String, Object> params = new HashMap<>();
+
+        combinedCloudProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciCombinedCloudOp.class),
+                                                 params, input);
+    }
+
+    private void copyBandsForCtp(Product targetProduct) {
+        IdepixIO.addCawaBands(sourceProduct, targetProduct);
+    }
+
+    private void addSurfacePressureBand() {
+        String presExpr = "(1013.25 * exp(-altitude/8400))";
+        final Band surfPresBand = new VirtualBand("surface_pressure",
+                                                  ProductData.TYPE_FLOAT32,
+                                                  targetProduct.getSceneRasterWidth(),
+                                                  targetProduct.getSceneRasterHeight(),
+                                                  presExpr);
+        surfPresBand.setDescription("estimated sea level pressure (p0=1013.25hPa, hScale=8.4km)");
+        surfPresBand.setNoDataValue(0);
+        surfPresBand.setNoDataValueUsed(true);
+        surfPresBand.setUnit("hPa");
+        targetProduct.addBand(surfPresBand);
+    }
+
+    private void addCloudOverSnowBand() {
+        String expr = "pixel_classif_flags.IDEPIX_LAND && Oa21_reflectance > 0.5 && surface_13 - trans_13 < 0.01";
+        final Band surfPresBand = new VirtualBand("cloud_over_snow",
+                                                  ProductData.TYPE_FLOAT32,
+                                                  targetProduct.getSceneRasterWidth(),
+                                                  targetProduct.getSceneRasterHeight(),
+                                                  expr);
+        surfPresBand.setDescription("Pixel identified as likely cloud over a snow/ice surface");
+        surfPresBand.setNoDataValue(0);
+        surfPresBand.setNoDataValueUsed(true);
+        surfPresBand.setUnit("dl");
+        targetProduct.addBand(surfPresBand);
     }
 
     /**
