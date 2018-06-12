@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.olci;
+package org.esa.s3tbx.idepix.olci.s3snow;
 
 /**
  * Constants for Idepix OLCI algorithm

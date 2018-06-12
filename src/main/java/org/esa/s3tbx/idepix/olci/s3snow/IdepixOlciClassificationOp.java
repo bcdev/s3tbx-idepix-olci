@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.olci;
+package org.esa.s3tbx.idepix.olci.s3snow;
 
 import com.bc.ceres.core.ProgressMonitor;
 import org.esa.s3tbx.idepix.core.IdepixConstants;

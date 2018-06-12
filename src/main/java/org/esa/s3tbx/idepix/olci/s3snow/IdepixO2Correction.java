@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.olci;
+package org.esa.s3tbx.idepix.olci.s3snow;
 
 import org.esa.snap.core.util.math.MathUtils;
 

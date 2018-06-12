@@ -1,4 +1,4 @@
-package org.esa.s3tbx.idepix.olci;
+package org.esa.s3tbx.idepix.olci.s3snow;
 
 import org.esa.s3tbx.idepix.core.AlgorithmSelector;
 import org.esa.s3tbx.idepix.core.IdepixConstants;
@@ -24,25 +24,16 @@ import java.util.Map;
 
 /**
  * The Idepix pixel classification operator for OLCI products.
- * <p>
- * Initial implementation:
- * - pure neural net approach which uses MERIS heritage bands only
- * - no auxdata available yet (such as 'L2 auxdata' for MERIS)
- * <p>
- * Currently resulting limitations:
- * - no cloud shadow flag
- * - glint flag over water just taken from 'sun_glint_risk' in L1 'quality_flags' band
- * <p>
- * Advanced algorithm to be defined which makes use of more bands.
+ * Specific plugin version for S3-SNOW project.
  *
  * @author olafd
  */
-@OperatorMetadata(alias = "Idepix.Sentinel3.Plugin.Olci",
+@OperatorMetadata(alias = "Idepix.Sentinel3.Olci.S3Snow",
         category = "Optical/Pre-Processing",
-        version = "1.0",
+        version = "0.8",
         authors = "Olaf Danne",
-        copyright = "(c) 2016 by Brockmann Consult",
-        description = "Pixel identification and classification for OLCI.")
+        copyright = "(c) 2018 by Brockmann Consult",
+        description = "Pixel identification and classification for OLCI. Specific plugin version for S3-SNOW project.")
 public class IdepixOlciOp extends BasisOp {
 
     @SourceProduct(alias = "sourceProduct",
@@ -62,91 +53,69 @@ public class IdepixOlciOp extends BasisOp {
     private boolean outputRadiance;
     private boolean outputRad2Refl;
 
-    @Parameter(description = "The list of radiance bands to write to target product.",
-            label = "Select TOA radiances to write to the target product",
-            valueSet = {
-                    "Oa01_radiance", "Oa02_radiance", "Oa03_radiance", "Oa04_radiance", "Oa05_radiance",
-                    "Oa06_radiance", "Oa07_radiance", "Oa08_radiance", "Oa09_radiance", "Oa10_radiance",
-                    "Oa11_radiance", "Oa12_radiance", "Oa13_radiance", "Oa14_radiance", "Oa15_radiance",
-                    "Oa16_radiance", "Oa17_radiance", "Oa18_radiance", "Oa19_radiance", "Oa20_radiance",
-                    "Oa21_radiance"
-            },
-            defaultValue = "")
-    String[] radianceBandsToCopy;
+    // we have many options from IDEPIX_DEVEL which are currently not needed for S3-SNOW, so they are disabled
 
-    @Parameter(description = "The list of reflectance bands to write to target product.",
-            label = "Select TOA reflectances to write to the target product",
-            valueSet = {
-                    "Oa01_reflectance", "Oa02_reflectance", "Oa03_reflectance", "Oa04_reflectance", "Oa05_reflectance",
-                    "Oa06_reflectance", "Oa07_reflectance", "Oa08_reflectance", "Oa09_reflectance", "Oa10_reflectance",
-                    "Oa11_reflectance", "Oa12_reflectance", "Oa13_reflectance", "Oa14_reflectance", "Oa15_reflectance",
-                    "Oa16_reflectance", "Oa17_reflectance", "Oa18_reflectance", "Oa19_reflectance", "Oa20_reflectance",
-                    "Oa21_reflectance"
-            },
-//            defaultValue = "Oa08_reflectance,Oa10_reflectance")
-            defaultValue = "")
-    String[] reflBandsToCopy;
+    //    @Parameter(description = "The list of radiance bands to write to target product.",
+//            label = "Select TOA radiances to write to the target product",
+//            valueSet = {
+//                    "Oa01_radiance", "Oa02_radiance", "Oa03_radiance", "Oa04_radiance", "Oa05_radiance",
+//                    "Oa06_radiance", "Oa07_radiance", "Oa08_radiance", "Oa09_radiance", "Oa10_radiance",
+//                    "Oa11_radiance", "Oa12_radiance", "Oa13_radiance", "Oa14_radiance", "Oa15_radiance",
+//                    "Oa16_radiance", "Oa17_radiance", "Oa18_radiance", "Oa19_radiance", "Oa20_radiance",
+//                    "Oa21_radiance"
+//            },
+//            defaultValue = "")
+    private String[] radianceBandsToCopy;
 
-    @Parameter(defaultValue = "false",
-            label = " Write NN value to the target product",
-            description = " If applied, write NN value to the target product ")
-    private boolean outputSchillerNNValue;
+    //    @Parameter(description = "The list of reflectance bands to write to target product.",
+//            label = "Select TOA reflectances to write to the target product",
+//            valueSet = {
+//                    "Oa01_reflectance", "Oa02_reflectance", "Oa03_reflectance", "Oa04_reflectance", "Oa05_reflectance",
+//                    "Oa06_reflectance", "Oa07_reflectance", "Oa08_reflectance", "Oa09_reflectance", "Oa10_reflectance",
+//                    "Oa11_reflectance", "Oa12_reflectance", "Oa13_reflectance", "Oa14_reflectance", "Oa15_reflectance",
+//                    "Oa16_reflectance", "Oa17_reflectance", "Oa18_reflectance", "Oa19_reflectance", "Oa20_reflectance",
+//                    "Oa21_reflectance"
+//            },
+//            defaultValue = "")
+//    private String[] reflBandsToCopy;
+    private String[] reflBandsToCopy = {"Oa07_reflectance"};  // test
 
-    @Parameter(defaultValue = "true", label = " Compute a cloud buffer")
-    private boolean computeCloudBuffer;
+    //    @Parameter(defaultValue = "false",
+//            label = " Write NN value to the target product",
+//            description = " If applied, write NN value to the target product ")
+//    private boolean outputSchillerNNValue;
+    private boolean outputSchillerNNValue = false;
 
-    @Parameter(defaultValue = "false",
-            label = " Compute binary mask 'cloud_over_snow' using O2 corrected band13 transmission (experimental option)",
-            description = " Computes and writes a binary mask 'cloud_over_snow' using O2 corrected transmission at " +
-                    "band 13 (experimental option, requires additional plugin and reflectance band 21)")
-    private boolean applyO2CorrectedTransmission;
+    //    @Parameter(defaultValue = "true", label = " Compute a cloud buffer")
+//    private boolean computeCloudBuffer;
+    private boolean computeCloudBuffer = true;
 
-    // no longer used
-//    @Parameter(defaultValue = "v3", valueSet = {"v3", "v1"},
-//            label = " Version of O2 Correction processor (if applied)",
-//            description = "Version of O2 Correction processor (if applied)")
-//    private String o2CorrectionVersion;
+    //    @Parameter(defaultValue = "false",
+//            label = " Compute binary mask 'cloud_over_snow' using O2 corrected band13 transmission (experimental option)",
+//            description = " Computes and writes a binary mask 'cloud_over_snow' using O2 corrected transmission at " +
+//                    "band 13 (experimental option, requires additional plugin and reflectance band 21)")
+//    private boolean applyO2CorrectedTransmission;
+    private boolean applyO2CorrectedTransmission = true;
 
     @Parameter(defaultValue = "band_1",
-            label = " Name of DEM band (if optionalDEM product is provided)",
-            description = "Version of O2 Correction processor (if applied)")
+            label = " Name of DEM band (if optional DEM product is provided)",
+            description = "Name of DEM band in DEM product (if optionally provided)")
     private String demBandName;
 
-    @Parameter(defaultValue = "2", interval = "[0,100]",
-            description = "The width of a cloud 'safety buffer' around a pixel which was classified as cloudy.",
-            label = "Width of cloud buffer (# of pixels)")
-    private int cloudBufferWidth;
-
-    @Parameter(defaultValue = "false",
-            label = " Compute cloud top pressure (experimental option, time consuming)",
-            description = " Compute cloud top pressure (time consuming, requires Python plugin based on CAWA). ")
-    private boolean computeCtp;
-
-    @Parameter(defaultValue = "false",
-            label = " Compute a cloud shadow (experimental option, requires cloud top pressure)",
-            description = " If applied, a cloud shadow is computed. " +
-                    "This requires the cloud top pressure operator (Python plugin based on CAWA) to be installed. " +
-                    "Still experimental. ")
-    private boolean computeCloudShadow;
-
-    @Parameter(defaultValue = "false",
-            label = " Compute 'combined cloud' band  (experimental option, following DM/JM)",
-            description = " Compute 'combined cloud' band  (experimental option, following DM/JM). " +
-                    "Requires nn_value, reflectance bands 2-8 and 17! ")
-    private boolean computeCombinedCloud;
-
+    //    @Parameter(defaultValue = "2", interval = "[0,100]",
+//            description = "The width of a cloud 'safety buffer' around a pixel which was classified as cloudy.",
+//            label = "Width of cloud buffer (# of pixels)")
+//    private int cloudBufferWidth;
+    private int cloudBufferWidth = 2;
 
     private Product classificationProduct;
     private Product postProcessingProduct;
-    private Product combinedCloudProduct;
 
     private Product rad2reflProduct;
-//    private Product waterMaskProduct;
 
     private Map<String, Product> classificationInputProducts;
     private Map<String, Object> classificationParameters;
     private Product o2CorrProduct;
-    private Product o2CloudProduct;
 
     @Override
     public void initialize() throws OperatorException {
@@ -155,8 +124,6 @@ public class IdepixOlciOp extends BasisOp {
         if (!inputProductIsValid) {
             throw new OperatorException(IdepixConstants.INPUT_INCONSISTENCY_ERROR_MESSAGE);
         }
-
-        computeCtp |= computeCloudShadow;
 
         outputRadiance = radianceBandsToCopy != null && radianceBandsToCopy.length > 0;
         outputRad2Refl = reflBandsToCopy != null && reflBandsToCopy.length > 0;
@@ -172,47 +139,14 @@ public class IdepixOlciOp extends BasisOp {
 
         ProductUtils.copyFlagBands(sourceProduct, olciIdepixProduct, true);
 
-        if (computeCtp || computeCloudBuffer || computeCloudShadow) {
-            if (computeCtp || computeCloudShadow) {
-                copyBandsForCtp(olciIdepixProduct);
-                Map<String, Product> ctpSourceProducts = new HashMap<>();
-                ctpSourceProducts.put("l1b", olciIdepixProduct);
-                Product ctpProduct = GPF.createProduct("py_olci_ctp_op", GPF.NO_PARAMS, ctpSourceProducts);
-                ProductUtils.copyBand("ctp", ctpProduct, olciIdepixProduct, true);
-                olciIdepixProduct.getBand("ctp").setUnit("hPa");
-            }
-            if (computeCloudBuffer || computeCloudShadow) {
-                postProcess(olciIdepixProduct);
-            }
-        }
-
-        if (computeCombinedCloud) {
-            processCombinedCloud(olciIdepixProduct);
+        if (computeCloudBuffer) {
+            postProcess(olciIdepixProduct);
         }
 
         targetProduct = createTargetProduct(olciIdepixProduct);
         targetProduct.setAutoGrouping(olciIdepixProduct.getAutoGrouping());
 
         if (applyO2CorrectedTransmission) {
-//            if (o2CorrectionVersion.equals("v1")) {
-//                for (int i = 13; i <= 15; i++) {
-//                    ProductUtils.copyBand("radiance_" + i, o2CorrProduct, "Oa" + i + "_radiance_o2corr",
-//                                          targetProduct, true);
-//                    ProductUtils.copyBand("trans_" + i, o2CorrProduct, "Oa" + i + "_trans_o2corr",
-//                                          targetProduct, true);
-//                }
-//                ProductUtils.copyBand("o2_cloud", o2CloudProduct, targetProduct, true);
-//                ProductUtils.copyBand("trans13_baseline", o2CloudProduct, targetProduct, true);
-//                ProductUtils.copyBand("trans13_baseline_AMFcorr", o2CloudProduct, targetProduct, true);
-//                ProductUtils.copyBand("trans13_excess", o2CloudProduct, targetProduct, true);
-//            } else {
-//                ProductUtils.copyBand("trans_13", o2CorrProduct, targetProduct, true);
-//                ProductUtils.copyBand("press_13", o2CorrProduct, targetProduct, true);
-//                ProductUtils.copyBand("surface_13", o2CorrProduct, targetProduct, true);
-//                ProductUtils.copyBand("altitude", sourceProduct, targetProduct, true);
-//                addSurfacePressureBand();
-//                addCloudOverSnowBand();
-//            }
             ProductUtils.copyBand("trans_13", o2CorrProduct, targetProduct, true);
             ProductUtils.copyBand("press_13", o2CorrProduct, targetProduct, true);
             ProductUtils.copyBand("surface_13", o2CorrProduct, targetProduct, true);
@@ -224,9 +158,6 @@ public class IdepixOlciOp extends BasisOp {
         if (postProcessingProduct != null) {
             Band cloudFlagBand = targetProduct.getBand(IdepixConstants.CLASSIF_BAND_NAME);
             cloudFlagBand.setSourceImage(postProcessingProduct.getBand(IdepixConstants.CLASSIF_BAND_NAME).getSourceImage());
-        }
-        if (combinedCloudProduct != null) {
-            ProductUtils.copyBand(IdepixOlciConstants.OLCI_COMBINED_CLOUD_BAND_NAME, combinedCloudProduct, targetProduct, true);
         }
     }
 
@@ -258,10 +189,6 @@ public class IdepixOlciOp extends BasisOp {
             ProductUtils.copyBand(IdepixConstants.NN_OUTPUT_BAND_NAME, idepixProduct, targetProduct, true);
         }
 
-        if (computeCtp) {
-            ProductUtils.copyBand(IdepixConstants.CTP_OUTPUT_BAND_NAME, idepixProduct, targetProduct, true);
-        }
-
         return targetProduct;
     }
 
@@ -272,21 +199,13 @@ public class IdepixOlciOp extends BasisOp {
         if (applyO2CorrectedTransmission) {
             Map<String, Product> o2corrSourceProducts = new HashMap<>();
             Map<String, Object> o2corrParms = new HashMap<>();
-            o2corrSourceProducts.put("l1b", sourceProduct);
+            o2corrSourceProducts.put("l1bProduct", sourceProduct);
             if (demProduct != null) {
                 o2corrSourceProducts.put("DEM", demProduct);
                 o2corrParms.put("demAltitudeBandName", demBandName);
             }
-//            final String o2CorrOpName = o2CorrectionVersion.equals("v1") ? "py_o2corr_op" : "py_o2corr_v3_op";
             final String o2CorrOpName = "O2CorrOlci";
             o2CorrProduct = GPF.createProduct(o2CorrOpName, o2corrParms, o2corrSourceProducts);
-
-//            if (o2CorrectionVersion.equals("v1")) {
-//                Map<String, Product> o2CloudSourceProducts = new HashMap<>();
-//                o2CloudSourceProducts.put("l1b", sourceProduct);
-//                o2CloudSourceProducts.put("o2", o2CorrProduct);
-//                o2CloudProduct = GPF.createProduct("Idepix.Olci.O2cloud", GPF.NO_PARAMS, o2CloudSourceProducts);
-//            }
         }
 
     }
@@ -316,25 +235,9 @@ public class IdepixOlciOp extends BasisOp {
 
         Map<String, Object> params = new HashMap<>();
         params.put("computeCloudBuffer", computeCloudBuffer);
-        params.put("computeCloudShadow", computeCloudShadow);
 
         postProcessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciPostProcessOp.class),
                                                   params, input);
-    }
-
-    private void processCombinedCloud(Product olciIdepixProduct) {
-        HashMap<String, Product> input = new HashMap<>();
-        input.put("rad2refl", rad2reflProduct);
-        input.put("olciCloud", olciIdepixProduct);
-
-        Map<String, Object> params = new HashMap<>();
-
-        combinedCloudProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciCombinedCloudOp.class),
-                                                 params, input);
-    }
-
-    private void copyBandsForCtp(Product targetProduct) {
-        IdepixIO.addCawaBands(sourceProduct, targetProduct);
     }
 
     private void addSurfacePressureBand() {
