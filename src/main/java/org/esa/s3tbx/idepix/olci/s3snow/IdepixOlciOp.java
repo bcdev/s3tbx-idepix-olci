@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @OperatorMetadata(alias = "Idepix.Sentinel3.Olci.S3Snow",
         category = "Optical/Pre-Processing",
-        version = "0.8",
+        version = "0.81",
         authors = "Olaf Danne",
         copyright = "(c) 2018 by Brockmann Consult",
         description = "Pixel identification and classification for OLCI. Specific plugin version for S3-SNOW project.")
@@ -67,7 +67,7 @@ public class IdepixOlciOp extends BasisOp {
 //            defaultValue = "")
     private String[] radianceBandsToCopy;
 
-    //    @Parameter(description = "The list of reflectance bands to write to target product.",
+//        @Parameter(description = "The list of reflectance bands to write to target product.",
 //            label = "Select TOA reflectances to write to the target product",
 //            valueSet = {
 //                    "Oa01_reflectance", "Oa02_reflectance", "Oa03_reflectance", "Oa04_reflectance", "Oa05_reflectance",
@@ -78,7 +78,7 @@ public class IdepixOlciOp extends BasisOp {
 //            },
 //            defaultValue = "")
 //    private String[] reflBandsToCopy;
-    private String[] reflBandsToCopy = {"Oa07_reflectance"};  // test
+    private String[] reflBandsToCopy = {"Oa21_reflectance"};  // needed for 'cloud over snow' band computation
 
     //    @Parameter(defaultValue = "false",
 //            label = " Write NN value to the target product",

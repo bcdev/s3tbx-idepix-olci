@@ -21,7 +21,7 @@
 
     <groupId>org.esa.s3tbx</groupId>
     <artifactId>s3tbx-idepix-olci-s3snow</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.81-SNAPSHOT</version>
 
     <name>S3TBX Idepix OLCI for S3-SNOW</name>
     <packaging>nbm</packaging>
@@ -99,6 +99,12 @@
             <groupId>org.esa.s3tbx</groupId>
             <artifactId>s3tbx-rad2refl</artifactId>
             <version>${snap.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.esa.s3tbx</groupId>
+            <artifactId>s3tbx-olci-o2corr</artifactId>
+            <version>0.81-SNAPSHOT</version>
         </dependency>
         
         <dependency>
