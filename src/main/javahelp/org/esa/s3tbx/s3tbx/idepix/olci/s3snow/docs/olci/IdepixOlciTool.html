@@ -16,7 +16,7 @@
 
 <html>
 <head>
-    <title>SNAP Data Processors - Idepix OLCI external plugin</title>
+    <title>SNAP Data Processors - Idepix OLCI</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link rel="stylesheet" href="../style.css">
 </head>
@@ -25,8 +25,11 @@
 <table class="header">
     <tr class="header">
         <td class="header">&nbsp;
-            Idepix OLCI external plugin</td>
-        <td class="header" align="right"><a href="nbdocs://org.esa.snap.snap.help/org/esa/snap/snap/help/docs/general/overview/SnapOverview.html"><img src="../images/snap_header.jpg" border=0></a>
+            Idepix OLCI plugin for S3-Snow
+        </td>
+        <td class="header" align="right"><a
+                href="nbdocs://org.esa.snap.snap.help/org/esa/snap/snap/help/docs/general/overview/SnapOverview.html"><img
+                src="../images/snap_header.jpg" border=0></a>
         </td>
     </tr>
 </table>
@@ -34,10 +37,11 @@
 <h3>Introduction</h3>
 
 <p>
-    The Idepix Processor provides a pixel classification into properties such as clear/cloudy, land/water, snow, ice etc.
+    The Idepix Processor provides a pixel classification into properties such as clear/cloudy, land/water, snow, ice
+    etc.
     The processing options/parameters as well as the underlying classification algorithms are instrument-dependent.
-    The Idepix processor core components are an internal part of the Sentinel-3 Toolbox of the current SNAP version.
-    Actually the following satellites/sensors are supported:
+    The Idepix processor modules for different satellites/sensors are an internal part of the Sentinel-3 Toolbox of
+    the current SNAP version. Actually the following satellites/sensors are supported:
 </p>
 
 <p>
@@ -82,20 +86,21 @@
 
 <br>
 <b>
-However, the processor described here is a plug-in version of the IdePix Sentinel-3 OLCI processor. This kind of specific IdePix
-plugins are suitable e.g. for experimental processor versions to test scientific improvements, or for the implementation
-of specific requirements in specific projects.
+    However, the processor described here is a plug-in version of the IdePix Sentinel-3 OLCI processor, being adapted
+    for the specific needs for a pixel classification within the S3-Snow project. This allows to more easily set up
+    experimental processor versions to test scientific improvements, and to provide special user options which
+    are ultimately not needed in other projects than S3-Snow..
 </b>
 <br>
 
 <br>
-Idepix is continuously being improved for already supported sensors and extended for further sensors in the frame
+In general, IdePix is continuously being improved for already supported sensors and extended for further sensors in the frame
 of various projects, such as the ESA LandCover ([1],[2]) and OceanColour ([3]) CCI projects.
 
 <br>
 
-<p><a href="IdepixOlciProcessorDescription.html">Idepix OLCI Processor Description</a></p>
-<p><a href="IdepixOlciAlgorithmSpecification.html">Idepix OLCI Algorithm Specification</a></p>
+<p><a href="IdepixOlciProcessorDescription.html">Idepix OLCI Processor Description (S3-SNOW version)</a></p>
+<p><a href="IdepixOlciAlgorithmSpecification.html">Idepix OLCI Algorithm Specification (S3-SNOW version)</a></p>
 
 <p><a href="IdepixOlciCommandLine.html">Processing from the Command Line</a></p>
 
