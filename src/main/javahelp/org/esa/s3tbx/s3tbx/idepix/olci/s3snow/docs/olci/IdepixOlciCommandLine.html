@@ -16,7 +16,7 @@
 
 <html>
 <head>
-    <title>SNAP Data Processors - Idepix OLCI external plugin - Command Line Description</title>
+    <title>SNAP Data Processors - Idepix OLCI Command Line Description</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 
@@ -25,7 +25,7 @@
 <table class="header">
     <tr class="header">
         <td class="header">&nbsp;
-            Idepix OLCI external plugin - Command Line Description
+            Idepix OLCI plugin for S3-Snow - Command Line Description
         </td>
         <td class="header" align="right"><a href="nbdocs://org.esa.snap.snap.help/org/esa/snap/snap/help/docs/general/overview/SnapOverview.html"><img src="../images/snap_header.jpg"
                                                                                      border=0></a>
@@ -51,19 +51,13 @@ To obtain general help on the graph processing, use the command
     </li>
 </ul>
 
-Specific help on the Idepix processor for a given instrument onboard a given satellite can be obtained with
+Specific help on the Idepix OLCI processor for S3-Snow can be obtained with
 <ul>
     <li>
-        ${S3TBX-INSTALL-DIR}/bin/gpt -h Idepix.&lt;Satellite&gt;.&lt;Instrument&gt;
+        ${S3TBX-INSTALL-DIR}/bin/gpt -h Idepix.Sentinel3.Olci.S3Snow
     </li>
 </ul>
 
-so we have here for OLCI:
-<ul>
-    <li>
-        ${S3TBX-INSTALL-DIR}/bin/gpt -h Idepix.Sentinel3.OLCI
-    </li>
-</ul>
 In this case, information on the usage and a list of all available parameters are given.
 
 The Idepix processor parameters can also be specified via a graph xml file.
@@ -71,18 +65,16 @@ E.g., a possible graph xml file for OLCI could look like the following. (Note th
 to explicitly set parameters if default values shall be used).
 <pre>
 
-    &lt;graph id="IdepixOlciTest"&gt;
+    &lt;graph id="IdepixOlciS3SnowTest"&gt;
         &lt;version&gt;1.0&lt;/version&gt;
         &lt;node id="idepix"&gt;
             &lt;operator&gt;Idepix.Sentinel3.Olci.S3Snow&lt;/operator&gt;
             &lt;sources&gt;
-                &lt;source&gt;${sourceProduct}&lt;/source&gt;
+                &lt;sourceProduct&gt;${sourceProduct}&lt;/sourceProduct&gt;
+                &lt;demProduct&gt;${demProduct}&lt;/demProduct&gt;
             &lt;/sources&gt;
             &lt;parameters&gt;
-                &lt;cloudBufferWidth&gt;3&lt;/cloudBufferWidth&gt;
-            &lt;/parameters&gt;
-            &lt;parameters&gt;
-                &lt;useSrtmLandWaterMask&gt;true&lt;/useSrtmLandWaterMask&gt;
+                &lt;demBandName&gt;myAltitude&lt;/demBandName&gt;
             &lt;/parameters&gt;
         &lt;/node&gt;
     &lt;/graph&gt;
