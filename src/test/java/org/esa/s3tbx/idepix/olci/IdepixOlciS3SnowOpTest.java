@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class IdepixOlciOpTest {
+public class IdepixOlciS3SnowOpTest {
 
     @Test
     public void testOperatorSpiIsLoaded() {

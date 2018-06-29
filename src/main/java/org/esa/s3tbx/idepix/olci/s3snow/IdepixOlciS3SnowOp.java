@@ -30,11 +30,11 @@ import java.util.Map;
  */
 @OperatorMetadata(alias = "Idepix.Sentinel3.Olci.S3Snow",
         category = "Optical/Pre-Processing",
-        version = "0.81",
+        version = "0.82",
         authors = "Olaf Danne",
         copyright = "(c) 2018 by Brockmann Consult",
         description = "Pixel identification and classification for OLCI. Specific plugin version for S3-SNOW project.")
-public class IdepixOlciOp extends BasisOp {
+public class IdepixOlciS3SnowOp extends BasisOp {
 
     @SourceProduct(alias = "sourceProduct",
             label = "OLCI L1b product",
@@ -176,7 +176,7 @@ public class IdepixOlciOp extends BasisOp {
         targetProduct.setStartTime(idepixProduct.getStartTime());
         targetProduct.setEndTime(idepixProduct.getEndTime());
 
-        IdepixOlciUtils.setupOlciClassifBitmask(targetProduct);
+        IdepixOlciS3SnowUtils.setupOlciClassifBitmask(targetProduct);
 
         if (outputRadiance) {
             IdepixIO.addRadianceBands(sourceProduct, targetProduct, radianceBandsToCopy);
@@ -218,7 +218,7 @@ public class IdepixOlciOp extends BasisOp {
 
     private void computeCloudProduct() {
         setClassificationParameters();
-        classificationProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciClassificationOp.class),
+        classificationProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciS3SnowClassificationOp.class),
                                                   classificationParameters, classificationInputProducts);
     }
 
@@ -236,7 +236,7 @@ public class IdepixOlciOp extends BasisOp {
         Map<String, Object> params = new HashMap<>();
         params.put("computeCloudBuffer", computeCloudBuffer);
 
-        postProcessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciPostProcessOp.class),
+        postProcessingProduct = GPF.createProduct(OperatorSpi.getOperatorAlias(IdepixOlciS3SnowPostProcessOp.class),
                                                   params, input);
     }
 
@@ -275,7 +275,7 @@ public class IdepixOlciOp extends BasisOp {
     public static class Spi extends OperatorSpi {
 
         public Spi() {
-            super(IdepixOlciOp.class);
+            super(IdepixOlciS3SnowOp.class);
         }
     }
 }

@@ -21,7 +21,7 @@
 
     <groupId>org.esa.s3tbx</groupId>
     <artifactId>s3tbx-idepix-olci-s3snow</artifactId>
-    <version>0.81-SNAPSHOT</version>
+    <version>0.82-SNAPSHOT</version>
 
     <name>S3TBX Idepix OLCI for S3-SNOW</name>
     <packaging>nbm</packaging>

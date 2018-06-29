@@ -5,7 +5,7 @@ package org.esa.s3tbx.idepix.olci.s3snow;
  *
  * @author olafd
  */
-public class IdepixOlciConstants {
+public class IdepixOlciS3SnowConstants {
 
     /* Level 1 Quality Flags Positions */
     public static final int L1_F_LAND = 31;

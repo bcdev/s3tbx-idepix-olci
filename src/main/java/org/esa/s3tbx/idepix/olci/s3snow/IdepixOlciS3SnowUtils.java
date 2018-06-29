@@ -10,7 +10,7 @@ import org.esa.snap.core.datamodel.Product;
  * @author olafd
  */
 
-public class IdepixOlciUtils {
+public class IdepixOlciS3SnowUtils {
 
     /**
      * Provides OLCI pixel classification flag coding

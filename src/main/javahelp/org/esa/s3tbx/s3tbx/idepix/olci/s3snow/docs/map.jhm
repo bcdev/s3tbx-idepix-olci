@@ -5,9 +5,13 @@
 
 <map version="2.0">
 
-    <mapID target="idepixPluginOlciS3snowTool" url="olci/IdepixOlciTool.html"/>
-    <mapID target="idepixPluginOlciAlgorithmSpecification" url="olci/IdepixOlciAlgorithmSpecification.html"/>
-    <mapID target="idepixPluginOlciProcessorDescription" url="olci/IdepixOlciProcessorDescription.html"/>
-    <mapID target="idepixPluginOlciCommandLine" url="olci/IdepixOlciCommandLine.html"/>
+    <mapID target="idepixPluginOlciS3SnowTool"
+           url="olci/IdepixOlciS3SnowTool.html"/>
+    <mapID target="idepixPluginOlciS3SnowAlgorithmSpecification"
+           url="olci/IdepixOlciS3SnowAlgorithmSpecification.html"/>
+    <mapID target="idepixPluginOlciS3SnowProcessorDescription"
+           url="olci/IdepixOlciS3SnowProcessorDescription.html"/>
+    <mapID target="idepixPluginOlciS3SnowCommandLine"
+           url="olci/IdepixOlciS3SnowCommandLine.html"/>
 
 </map>

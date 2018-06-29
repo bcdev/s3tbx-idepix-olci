@@ -4,14 +4,14 @@
 
     <folder name="Actions">
         <folder name="Operators">
-            <file name="org-esa-s3tbx-idepix-olci-IdepixOlciOpAction.instance">
+            <file name="org-esa-s3tbx-idepix-olci-IdepixOlciS3SnowOpAction.instance">
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="delegate" methodvalue="org.esa.snap.core.gpf.ui.DefaultOperatorAction.create"/>
                 <attr name="displayName" stringvalue="Sentinel-3 OLCI for S3-SNOW"/>
                 <attr name="operatorName" stringvalue="Idepix.Sentinel3.Olci.S3Snow"/>
-                <attr name="dialogTitle" stringvalue="IdePix (Sentinel-3 OLCI for S3-SNOW) - v0.81"/>
+                <attr name="dialogTitle" stringvalue="IdePix (Sentinel-3 OLCI for S3-SNOW) - v0.82"/>
                 <attr name="targetProductNameSuffix" stringvalue="_idepix"/>
-                <attr name="helpId" stringvalue="idepixPluginOlciS3snowTool"/>
+                <attr name="helpId" stringvalue="idepixPluginOlciS3SnowTool"/>
             </file>
         </folder>
     </folder>
@@ -21,9 +21,9 @@
             <folder name="Preprocessing">
                 <folder name="Masking">
                     <folder name="IdePix (Clouds, Land, Water, ...)">
-                        <file name="org-esa-s3tbx-idepix-olci-IdepixOlciOpAction.shadow">
+                        <file name="org-esa-s3tbx-idepix-olci-IdepixOlciS3SnowOpAction.shadow">
                             <attr name="originalFile"
-                                  stringvalue="Actions/Operators/org-esa-s3tbx-idepix-olci-IdepixOlciOpAction.instance"/>
+                                  stringvalue="Actions/Operators/org-esa-s3tbx-idepix-olci-IdepixOlciS3SnowOpAction.instance"/>
                             <attr name="position" intvalue="1"/>
                             <attr name="displayName" stringvalue="Idepix (Sentinel-3 OLCI) for S3-SNOW"/>
                         </file>

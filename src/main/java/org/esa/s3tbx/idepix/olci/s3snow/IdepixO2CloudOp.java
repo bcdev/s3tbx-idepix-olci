@@ -59,9 +59,9 @@ public class IdepixO2CloudOp extends Operator {
         ozaTpg = sourceProduct.getTiePointGrid("OZA");
 
         if (sourceProduct.getName().contains("_EFR") || sourceProduct.getProductType().contains("_EFR")) {
-            cameraBounds = IdepixOlciConstants.CAMERA_BOUNDS_FR;
+            cameraBounds = IdepixOlciS3SnowConstants.CAMERA_BOUNDS_FR;
         } else if (sourceProduct.getName().contains("_ERR") || sourceProduct.getProductType().contains("_ERR")) {
-            cameraBounds = IdepixOlciConstants.CAMERA_BOUNDS_RR;
+            cameraBounds = IdepixOlciS3SnowConstants.CAMERA_BOUNDS_RR;
         } else {
             throw new OperatorException(IdepixConstants.INPUT_INCONSISTENCY_ERROR_MESSAGE);
         }

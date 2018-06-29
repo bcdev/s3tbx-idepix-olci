@@ -33,7 +33,7 @@ import java.awt.*;
         authors = "Olaf Danne",
         copyright = "(c) 2016 by Brockmann Consult",
         description = "Refines the OLCI pixel classification over both land and water.")
-public class IdepixOlciPostProcessOp extends Operator {
+public class IdepixOlciS3SnowPostProcessOp extends Operator {
 
     @Parameter(defaultValue = "true",
             label = " Compute a cloud buffer",

@@ -26,7 +26,7 @@ import java.awt.*;
         authors = "Olaf Danne",
         copyright = "(c) 2018 by Brockmann Consult",
         description = "Operator providing 'combined cloud' for OLCI (request DM/JM). Experimental.")
-public class IdepixOlciCombinedCloudOp extends Operator {
+public class IdepixOlciS3SnowCombinedCloudOp extends Operator {
 
     @SourceProduct(alias = "rad2refl")
     private Product rad2reflProduct;
@@ -58,7 +58,7 @@ public class IdepixOlciCombinedCloudOp extends Operator {
         refl17Band = rad2reflProduct.getBand("Oa17_reflectance");
         nnValueBand = olciCloudProduct.getBand(IdepixConstants.NN_OUTPUT_BAND_NAME);
 
-        combinedCloudProduct.addBand(IdepixOlciConstants.OLCI_COMBINED_CLOUD_BAND_NAME, ProductData.TYPE_INT8);
+        combinedCloudProduct.addBand(IdepixOlciS3SnowConstants.OLCI_COMBINED_CLOUD_BAND_NAME, ProductData.TYPE_INT8);
         setTargetProduct(combinedCloudProduct);
     }
 
@@ -85,7 +85,7 @@ public class IdepixOlciCombinedCloudOp extends Operator {
 
                 final boolean isIdepixCloud = idepixFlagsTile.getSampleBit(x, y, IdepixConstants.IDEPIX_CLOUD);
                 final boolean isIdepixLand = idepixFlagsTile.getSampleBit(x, y, IdepixConstants.IDEPIX_LAND);
-                final boolean isFreshInlandWater = qualityFlagsTile.getSampleBit(x, y, IdepixOlciConstants.L1_F_FRESH_INLAND_WATER);
+                final boolean isFreshInlandWater = qualityFlagsTile.getSampleBit(x, y, IdepixOlciS3SnowConstants.L1_F_FRESH_INLAND_WATER);
 
                 final boolean cloud_1 = isIdepixCloud && ndvi < 0.1 && ndvi > 0.0 && meanReflVis > 0.2;
                 final boolean cloud_2 = isIdepixCloud && isIdepixLand;
