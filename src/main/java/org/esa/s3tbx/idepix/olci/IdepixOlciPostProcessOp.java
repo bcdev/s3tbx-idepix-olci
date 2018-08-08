@@ -1,9 +1,9 @@
 package org.esa.s3tbx.idepix.olci;
 
 import com.bc.ceres.core.ProgressMonitor;
-import org.esa.s3tbx.idepix.algorithms.CloudBuffer;
-import org.esa.s3tbx.idepix.algorithms.CloudShadowFronts;
+import org.esa.s3tbx.idepix.core.CloudShadowFronts;
 import org.esa.s3tbx.idepix.core.IdepixConstants;
+import org.esa.s3tbx.idepix.core.operators.CloudBuffer;
 import org.esa.s3tbx.idepix.core.util.IdepixIO;
 import org.esa.s3tbx.idepix.core.util.IdepixUtils;
 import org.esa.snap.core.datamodel.Band;
@@ -12,7 +12,6 @@ import org.esa.snap.core.datamodel.Product;
 import org.esa.snap.core.datamodel.TiePointGrid;
 import org.esa.snap.core.gpf.Operator;
 import org.esa.snap.core.gpf.OperatorException;
-import org.esa.snap.core.gpf.OperatorSpi;
 import org.esa.snap.core.gpf.Tile;
 import org.esa.snap.core.gpf.annotations.OperatorMetadata;
 import org.esa.snap.core.gpf.annotations.Parameter;
@@ -201,13 +200,6 @@ public class IdepixOlciPostProcessOp extends Operator {
         int sourceFlags = sourceFlagTile.getSampleInt(x, y);
         int computedFlags = targetTile.getSampleInt(x, y);
         targetTile.setSample(x, y, sourceFlags | computedFlags);
-    }
-
-    public static class Spi extends OperatorSpi {
-
-        public Spi() {
-            super(IdepixOlciPostProcessOp.class);
-        }
     }
 
 }

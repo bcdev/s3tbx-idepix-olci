@@ -11,7 +11,6 @@ import org.esa.s3tbx.processor.rad2refl.Rad2ReflConstants;
 import org.esa.snap.core.datamodel.*;
 import org.esa.snap.core.gpf.Operator;
 import org.esa.snap.core.gpf.OperatorException;
-import org.esa.snap.core.gpf.OperatorSpi;
 import org.esa.snap.core.gpf.Tile;
 import org.esa.snap.core.gpf.annotations.OperatorMetadata;
 import org.esa.snap.core.gpf.annotations.Parameter;
@@ -386,9 +385,4 @@ public class IdepixOlciClassificationOp extends Operator {
         targetTile.setSample(x, y, IdepixConstants.IDEPIX_BRIGHT, false);
     }
 
-    public static class Spi extends OperatorSpi {
-        public Spi() {
-            super(IdepixOlciClassificationOp.class);
-        }
-    }
 }
